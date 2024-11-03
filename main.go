@@ -5,9 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"cags/api/routes"
+
+	_ "github.com/go-sql-driver/mysql" // MySQL driver
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	_ "github.com/go-sql-driver/mysql" // MySQL driver
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 // Database instance
@@ -50,19 +54,23 @@ func main() {
 	}
 	defer db.Close()
 
-	// fiber instance and HelloWorld
+	// Create a Fiber instance
 	app := fiber.New()
 
+	// add logger middleware
+	//app.Use(logger.New())
 
-	// routes
-	app.Get("/", hello)
 
-	// start server
-	log.Fatal(app.Listen(":9000"))
-}
+	app.Use(logger.New(logger.Config{
+		Format:     "[${time}] ${status} - ${method} ${path}\n",
+		TimeFormat: "2006-01-02 15:04:05",
+		TimeZone:   "Local",
+	}))
+	
+	// Register the hello route
+	routes.HelloRoute(app)
 
-// handler function
-func hello(c *fiber.Ctx) error {
-	return c.SendString("Hello, World!")
+	// Start the server
+	log.Fatal(app.Listen(":3000"))
 }
 
