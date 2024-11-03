@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	_ "github.com/go-sql-driver/mysql" // MySQL driver
 )
@@ -49,5 +49,20 @@ func main() {
 		log.Fatal("Database Connection Error:", err)
 	}
 	defer db.Close()
+
+	// fiber instance and HelloWorld
+	app := fiber.New()
+
+
+	// routes
+	app.Get("/", hello)
+
+	// start server
+	log.Fatal(app.Listen(":3000"))
+}
+
+// handler function
+func hello(c *fiber.Ctx) error {
+	return c.SendString("Hello, World!")
 }
 
